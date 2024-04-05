@@ -101,10 +101,30 @@ if __name__ == '__main__':
                                         'player_name' : player_3}))
 
     time.sleep(1) # Wait a second to resolve game start
+    # client.publish(f"games/{lobby_name}/start", "START")
+    # client.publish(f"games/{lobby_name}/{player_1}/move", "UP")
+    # client.publish(f"games/{lobby_name}/{player_2}/move", "DOWN")
+    # client.publish(f"games/{lobby_name}/{player_3}/move", "DOWN")
+    # client.publish(f"games/{lobby_name}/start", "STOP")
+
     client.publish(f"games/{lobby_name}/start", "START")
-    client.publish(f"games/{lobby_name}/{player_1}/move", "UP")
-    client.publish(f"games/{lobby_name}/{player_2}/move", "DOWN")
-    client.publish(f"games/{lobby_name}/{player_3}/move", "DOWN")
+
+    client.loop_start()
+
+    time.sleep(3)
+
+    #onchange
+    while(True):
+        p1_move = input("Player 1, make your move: ")
+        p2_move = input("Player 2, make your move: ")
+        p3_move = input("Player 3, make your move: ")
+
+        client.publish(f"games/{lobby_name}/{player_1}/move", p1_move)
+        client.publish(f"games/{lobby_name}/{player_2}/move", p2_move)
+        client.publish(f"games/{lobby_name}/{player_3}/move", p3_move)
+
+        time.sleep(3)
+
     client.publish(f"games/{lobby_name}/start", "STOP")
 
 
