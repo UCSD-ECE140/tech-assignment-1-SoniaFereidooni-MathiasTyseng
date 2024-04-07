@@ -83,6 +83,7 @@ if __name__ == '__main__':
     player_1 = "Player1"
     player_2 = "Player2"
     player_3 = "Player3"
+    player_4 = "Player4"
 
     client.subscribe(f"games/{lobby_name}/lobby")
     client.subscribe(f'games/{lobby_name}/+/game_state')
@@ -93,12 +94,16 @@ if __name__ == '__main__':
                                             'player_name' : player_1}))
     
     client.publish("new_game", json.dumps({'lobby_name':lobby_name,
-                                            'team_name':'BTeam',
+                                            'team_name':'ATeam',
                                             'player_name' : player_2}))
     
     client.publish("new_game", json.dumps({'lobby_name':lobby_name,
                                         'team_name':'BTeam',
                                         'player_name' : player_3}))
+    
+    client.publish("new_game", json.dumps({'lobby_name':lobby_name,
+                                        'team_name':'BTeam',
+                                        'player_name' : player_4}))
 
     time.sleep(1) # Wait a second to resolve game start
     # client.publish(f"games/{lobby_name}/start", "START")
@@ -118,10 +123,12 @@ if __name__ == '__main__':
         p1_move = input("Player 1, make your move: ")
         p2_move = input("Player 2, make your move: ")
         p3_move = input("Player 3, make your move: ")
+        p4_move = input("Player 4, make your move: ")
 
         client.publish(f"games/{lobby_name}/{player_1}/move", p1_move)
         client.publish(f"games/{lobby_name}/{player_2}/move", p2_move)
         client.publish(f"games/{lobby_name}/{player_3}/move", p3_move)
+        client.publish(f"games/{lobby_name}/{player_4}/move", p4_move)
 
         time.sleep(3)
 
