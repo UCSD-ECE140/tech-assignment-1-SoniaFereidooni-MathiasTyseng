@@ -461,15 +461,14 @@ if __name__ == '__main__':
             p3_move = "LEFT"
         
         # select player 4 move
-        
-        if (up_pos_p4 not in walls and up_in_range_p4 and p4_up_check and up_pos_p4 not in currentPosition_p4):
-            p4_move = "UP"
+        if (left_pos_p4 not in walls and left_in_range_p4 and p4_left_check and left_pos_p4 not in currentPosition_p4):
+            p4_move = "LEFT"
         elif (down_pos_p4 not in walls and down_in_range_p4 and p4_down_check and down_pos_p4 not in currentPosition_p4):
             p4_move = "DOWN"
         elif (right_pos_p4 not in walls and right_in_range_p4 and p4_right_check and right_pos_p4 not in currentPosition_p4):
             p4_move = "RIGHT"
-        elif (left_pos_p4 not in walls and left_in_range_p4 and p4_left_check and left_pos_p4 not in currentPosition_p4):
-            p4_move = "LEFT"
+        elif (up_pos_p4 not in walls and up_in_range_p4 and p4_up_check and up_pos_p4 not in currentPosition_p4):
+            p4_move = "UP"
         elif (up_pos_p4 not in walls and up_in_range_p4):
             p4_move = "UP"
         elif (down_pos_p4 not in walls and down_in_range_p4):
