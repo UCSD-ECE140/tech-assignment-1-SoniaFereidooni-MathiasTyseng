@@ -6,10 +6,12 @@ import paho.mqtt.client as paho
 from paho import mqtt
 import time
 
+# stores current positions in the form of a stack--acts as an array to store all visited/explored positions
 currentPosition_p1 = []
 currentPosition_p2 = []
 currentPosition_p3 = []
 currentPosition_p4 = []
+
 coin1 = None
 coin2 = None
 coin3 = None
@@ -78,11 +80,6 @@ def on_message(client, userdata, msg):
     
     if ("Player4" in msg.topic):
         currentPosition_p4.append(json.loads(msg.payload).get("currentPosition"))
-    
-    
-    # coin1 = json.loads(msg.payload).get("coin1")
-    # coin2 = json.loads(msg.payload).get("coin2")
-    # coin3 = json.loads(msg.payload).get("coin3")
 
     walls_vals = json.loads(msg.payload).get("walls")
 
@@ -90,8 +87,6 @@ def on_message(client, userdata, msg):
         for wall in walls_vals:
             if(wall not in walls):
                 walls.append(wall)
-
-    # walls.append(json.loads(msg.payload).get("walls"))
     
     enemyPositions = json.loads(msg.payload).get("enemyPositions")
 
@@ -147,11 +142,6 @@ if __name__ == '__main__':
                                         'player_name' : player_4}))
 
     time.sleep(1) # Wait a second to resolve game start
-    # client.publish(f"games/{lobby_name}/start", "START")
-    # client.publish(f"games/{lobby_name}/{player_1}/move", "UP")
-    # client.publish(f"games/{lobby_name}/{player_2}/move", "DOWN")
-    # client.publish(f"games/{lobby_name}/{player_3}/move", "DOWN")
-    # client.publish(f"games/{lobby_name}/start", "STOP")
 
     client.publish(f"games/{lobby_name}/start", "START")
 
@@ -161,12 +151,14 @@ if __name__ == '__main__':
 
     explored = []
 
-    #onchange
     while(True):
+        # get the current position from the explored positions arrays for each player (acts as a stack)
         curr_pos_p1 = currentPosition_p1[-1]
         curr_pos_p2 = currentPosition_p2[-1]
         curr_pos_p3 = currentPosition_p3[-1]
         curr_pos_p4 = currentPosition_p4[-1]
+
+        ## calculate the future (x,y) coordinates of each player given each type of move
 
         # player 1 possible positions
 
@@ -240,9 +232,7 @@ if __name__ == '__main__':
         left_pos_p4_y = int(curr_pos_p4[1])-1
         left_pos_p4 = [left_pos_p4_x, left_pos_p4_y]
 
-        print(curr_pos_p1)
-        print("WALLS: ", walls)
-        # print(up_pos_p1)
+        ## checks if the player is in the range of the grid (ie. between 0 and 9 on x and y axis)
 
         # player 1 in range check
 
@@ -272,6 +262,9 @@ if __name__ == '__main__':
         right_in_range_p4 = right_pos_p4[0] >= 0 and right_pos_p4[1] >= 0 and right_pos_p4[0] <= 9 and right_pos_p4[1] <= 9
         left_in_range_p4 = left_pos_p4[0] >= 0 and left_pos_p4[1] >= 0 and left_pos_p4[0] <= 9 and left_pos_p4[1] <= 9
 
+        ## check if the the future position for each type of move has already been explored
+        # Store this information as a boolean
+
         # check if explored player 1
         up_not_explored_p1 = up_pos_p1 not in currentPosition_p1
         down_not_explored_p1 = down_pos_p1 not in currentPosition_p1
@@ -296,49 +289,9 @@ if __name__ == '__main__':
         right_not_explored_p4 = right_pos_p4 not in currentPosition_p4
         left_not_explored_p4 = left_pos_p4 not in currentPosition_p4
 
-        # select player 1 move
-
-        # if (up_pos_p1 not in walls and up_in_range_p1 and up_not_explored_p1):
-        #     p1_move = "UP"
-        # elif (down_pos_p1 not in walls and down_in_range_p1 and down_not_explored_p1):
-        #     p1_move = "DOWN"
-        # elif (right_pos_p1 not in walls and right_in_range_p1 and right_in_range_p1):
-        #     p1_move = "RIGHT"
-        # else:
-        #     p1_move = "LEFT"
-        
-        # # select player 2 move
-        
-        # if (up_pos_p2 not in walls and up_in_range_p2 and up_not_explored_p2):
-        #     p2_move = "UP"
-        # elif (down_pos_p2 not in walls and down_in_range_p2 and down_not_explored_p2):
-        #     p2_move = "DOWN"
-        # elif (right_pos_p2 not in walls and right_in_range_p2 and right_not_explored_p2):
-        #     p2_move = "RIGHT"
-        # else:
-        #     p2_move = "LEFT"
-        
-        # # select player 3 move
-        
-        # if (up_pos_p3 not in walls and up_in_range_p3 and up_not_explored_p3):
-        #     p3_move = "UP"
-        # elif (down_pos_p3 not in walls and down_in_range_p3 and down_not_explored_p3):
-        #     p3_move = "DOWN"
-        # elif (right_pos_p3 not in walls and right_in_range_p3 and right_not_explored_p3):
-        #     p3_move = "RIGHT"
-        # else:
-        #     p3_move = "LEFT"
-
-        # # select player 4 move
-        
-        # if (up_pos_p4 not in walls and up_in_range_p4 and up_not_explored_p4):
-        #     p4_move = "UP"
-        # elif (down_pos_p4 not in walls and down_in_range_p4 and down_not_explored_p4):
-        #     p4_move = "DOWN"
-        # elif (right_pos_p4 not in walls and right_in_range_p4 and right_not_explored_p4):
-        #     p4_move = "RIGHT"
-        # else:
-        #     p4_move = "LEFT"
+        ## checking for existing players
+        # checks if the future positions for each type of move  are empty or contain a different player. 
+        # Store this information as a boolean
 
         # check for existing players - player 1
         p1_up_p2_check = up_pos_p1 != curr_pos_p2
@@ -443,6 +396,15 @@ if __name__ == '__main__':
 
         p4_left_check = p4_left_p1_check and p4_left_p2_check and p4_left_p3_check
 
+        ## selecting player moves
+
+        # logic: check sequentially if each type of move would end up in a wall, is in range of the playing grid, -
+        # - would not hit another player, and is not in the explored nodes for that player
+        # if all of the move types do not meet all the criteria listed above, then check if all the conditions other than -
+        # - being an explored node are met, and select a move accordingly
+
+        # select player 1 move
+
         if (up_pos_p1 not in walls and up_in_range_p1 and p1_up_check and up_pos_p1 not in currentPosition_p1):
             p1_move = "UP"
         elif (down_pos_p1 not in walls and down_in_range_p1 and p1_down_check and down_pos_p1 not in currentPosition_p1):
@@ -497,6 +459,7 @@ if __name__ == '__main__':
             p3_move = "DOWN"
         else:
             p3_move = "LEFT"
+        
         # select player 4 move
         
         if (up_pos_p4 not in walls and up_in_range_p4 and p4_up_check and up_pos_p4 not in currentPosition_p4):
@@ -515,12 +478,6 @@ if __name__ == '__main__':
             p4_move = "RIGHT"
         else:
             p4_move = "LEFT"
-
-
-        # p1_move = input("Player 1, make your move: ")
-        # p2_move = input("Player 2, make your move: ")
-        # p3_move = input("Player 3, make your move: ")
-        # p4_move = input("Player 4, make your move: ")
         
 
         client.publish(f"games/{lobby_name}/{player_1}/move", p1_move)
@@ -528,7 +485,7 @@ if __name__ == '__main__':
         client.publish(f"games/{lobby_name}/{player_3}/move", p3_move)
         client.publish(f"games/{lobby_name}/{player_4}/move", p4_move)
 
-        time.sleep(3)
+        time.sleep(1)
 
     client.publish(f"games/{lobby_name}/start", "STOP")
 
